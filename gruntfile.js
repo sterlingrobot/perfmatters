@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     // Unified Watch Object
     var watchFiles = {
         clientJS: ['js/*.js', 'views/js/*.js'],
-        clientCSS: ['css/*.css', 'views/css/*.css']
+        clientCSS: ['views/css/*.css', 'css/*.css']
     };
     // Project Configuration
     grunt.initConfig({
@@ -50,8 +50,8 @@ module.exports = function(grunt) {
                 files: {
                     'dist/js/<%= pkg.name %>.js': ['js/*.js'],
                     'dist/views/js/<%= pkg.name %>.js': ['views/js/*.js'],
-                    'dist/css/<%= pkg.name %>.min.css': ['css/*.css'],
-                    'dist/views/css/<%= pkg.name %>.min.css': ['views/css/*.css']
+                    'dist/css/<%= pkg.name %>.css': ['css/*.css'],
+                    'dist/views/css/<%= pkg.name %>.css': ['views/css/*.css']
                 }
             }
         },
@@ -70,13 +70,17 @@ module.exports = function(grunt) {
         cssmin: {
             options: {
                 // the banner is inserted at the top of the output
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
+                debug: true
             },
             dist: {
-                // the files to concatenate
-                src: watchFiles.clientCSS,
-                // the location of the resulting JS file
-                dest: 'dist/css/<%= pkg.name %>.min.css'
+                files: [{
+                  expand: true,
+                  cwd: 'dist/',
+                  src: ['*.css', 'views/css/*.css', '!*.min.css', '!views/css/*.min.css'],
+                  dest: 'dist/',
+                  ext: '.min.css'
+                }]
             }
         },
         htmlmin: {
@@ -98,32 +102,13 @@ module.exports = function(grunt) {
                 }
             },
         },
-        copy: {
-            dist: {
-                files: [
-                    // includes files within path
-                    {
-                        expand: true,
-                        src: ['img/*'],
-                        dest: 'dist',
-                        filter: 'isFile'
-                    },
-                    {
-                        expand: true,
-                        src: ['views/images/*'],
-                        dest: 'dist',
-                        filter: 'isFile'
-                    }
-                ]
-            }
-        },
         ngrok: {
             options: {
                 authToken: '58gG2R84WMhabrMngcXCN_v5xdHwbeUs52ZUiHucxz'
             },
             server: {
                 proto: 'http',
-                port: 80,
+                port: 8083,
                 remotePort: 50010,
                 onConnected: function(url) {
                     grunt.log.writeln('Local server exposed to %s!', url);
@@ -147,6 +132,18 @@ module.exports = function(grunt) {
                     strategy: "mobile"
                 }
             }
+        },
+        imagemin: {
+            options: {
+                optimizationLevel: 3
+            },
+            dynamic: {
+                files: [{
+                    expand: true,
+                    src: ['img/*.{png,jpg,gif}', 'views/images/*.{png,jpg,gif}'],
+                    dest: 'dist/'
+                }]
+            }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -156,11 +153,14 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
-    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-imagemin');
     grunt.loadNpmTasks('grunt-ngrok');
     grunt.loadNpmTasks('grunt-pagespeed');
-    // Default task(s).
-    grunt.registerTask('default', ['uglify', 'concat', 'cssmin', 'htmlmin', 'copy']);
+    grunt.loadNpmTasks('grunt-newer');
+
+    grunt.registerTask('default', ['lint', 'optimize', 'psi-ngrok', 'watch']);
+    grunt.registerTask('lint', ['jshint', 'csslint']);
+    grunt.registerTask('optimize', ['newer:uglify', 'newer:concat', 'newer:cssmin', 'newer:htmlmin', 'newer:imagemin']);
     grunt.registerTask('psi-ngrok', 'Run pagespeed with ngrok', function() {
         var done = this.async();
         var port = 8083;
