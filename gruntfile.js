@@ -44,6 +44,21 @@ module.exports = function(grunt) {
                 src: ['dist/css/<%= pkg.name %>.css', 'dist/views/css/<%= pkg.name %>.css']
             }
         },
+        // Copy things to a temp dir, and only change things in the temp dir
+        copy: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: '',
+                    src: ['*.html', 'css/**', 'js/**', 'views/**'],
+                    dest: 'output/'
+                }]
+            }
+        },
+        useref: {
+            html: 'output/**/*.html',
+            temp: 'output'
+        },
         concat: {
             options: {
                 // define a string to put between each file in the concatenated output
@@ -51,10 +66,10 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    'dist/js/<%= pkg.name %>.js': ['js/*.js'],
-                    'dist/views/js/<%= pkg.name %>.js': ['views/js/*.js'],
-                    'dist/css/<%= pkg.name %>.css': ['css/*.css'],
-                    'dist/views/css/<%= pkg.name %>.css': ['views/css/*.css']
+                    'dist/js/<%= pkg.name %>.js': ['output/js/*.js'],
+                    'dist/views/js/<%= pkg.name %>.js': ['output/views/js/*.js'],
+                    'dist/css/<%= pkg.name %>.css': ['output/css/*.css'],
+                    'dist/views/css/<%= pkg.name %>.css': ['output/views/css/*.css']
                 }
             }
         },
@@ -84,7 +99,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: '',
-                    src: ['css/*.css', 'views/css/*.css'],
+                    src: ['output/css/*.css', 'output/views/css/*.css'],
                     dest: 'dist/',
                     ext: '.min.css'
                 }]
@@ -101,11 +116,11 @@ module.exports = function(grunt) {
                     minifyJS: true
                 },
                 files: { // Dictionary of files
-                    'dist/index.html': 'index.html', // 'destination': 'source'
-                    'dist/project-2048.html': 'project-2048.html',
-                    'dist/project-mobile.html': 'project-mobile.html',
-                    'dist/project-webperf.html': 'project-webperf.html',
-                    'dist/views/pizza.html': 'views/pizza.html'
+                    'dist/index.html': 'output/index.html', // 'destination': 'source'
+                    'dist/project-2048.html': 'output/project-2048.html',
+                    'dist/project-mobile.html': 'output/project-mobile.html',
+                    'dist/project-webperf.html': 'output/project-webperf.html',
+                    'dist/views/pizza.html': 'output/views/pizza.html'
                 }
             },
         },
@@ -138,18 +153,18 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-csslint');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-useref');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-contrib-imagemin');
     grunt.loadNpmTasks('grunt-postcss');
     grunt.loadNpmTasks('grunt-ngrok');
     grunt.loadNpmTasks('grunt-pagespeed');
     grunt.loadNpmTasks('grunt-newer');
-
-    grunt.registerTask('default', ['optimize', 'lint', 'psi-ngrok'/*, 'watch'*/]);
+    grunt.registerTask('default', ['optimize', 'lint', 'psi-ngrok' /*, 'watch'*/ ]);
     grunt.registerTask('lint', ['jshint', 'csslint:src']);
-    grunt.registerTask('optimize', ['newer:uglify', 'newer:concat', 'newer:postcss', 'newer:htmlmin', 'newer:imagemin']);
+    grunt.registerTask('build', ['newer:copy', 'useref', 'optimize']);
+    grunt.registerTask('optimize', ['newer:concat', 'newer:uglify', 'newer:postcss', 'newer:htmlmin', 'newer:imagemin']);
     grunt.registerTask('psi-ngrok', 'Run pagespeed with ngrok', function() {
         var done = this.async();
         var port = 8083;

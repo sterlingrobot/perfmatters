@@ -2,7 +2,7 @@
   "name": "perfmatters",
   "version": "1.0.0",
   "description": "Udacity Front End Web Developer Nanodegree Project 4 - Website Performance Optimization",
-  "main": "gruntfile.js",
+  "main": "index.html",
   "devDependencies": {
     "autoprefixer-core": "^5.2.0",
     "csswring": "^3.0.5",
@@ -20,6 +20,7 @@
     "grunt-ngrok": "^0.2.2",
     "grunt-pagespeed": "^1.0.0",
     "grunt-postcss": "^0.4.0",
+    "grunt-useref": "0.0.16",
     "gulp": "^3.8.11",
     "jslint": "^0.9.0-pre005",
     "load-grunt-tasks": "^3.2.0",
