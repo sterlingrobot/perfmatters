@@ -426,6 +426,8 @@ var resizePizzas = function(size) {
     var randomPizzas = document.querySelectorAll(".randomPizzaContainer");
     var newsize;
 
+    // No need to call superfluous function determineDx (removed) since
+    // we only need to set percentage width based on slider size
     switch(size) {
       case "1":
         newsize = 25;
@@ -489,6 +491,9 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
+  // Use getElementsByClassName instead of querySelectorAll
+  // Calculate scrollTop outside of for loop
+  // Initialize items.length as variable
   var items = document.getElementsByClassName('mover');
   var scrollPos = document.body.scrollTop / 1250;
 
