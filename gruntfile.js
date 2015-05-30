@@ -19,7 +19,7 @@ module.exports = function(grunt) {
             },
             clientCSS: {
                 files: watchFiles.clientCSS,
-                tasks: ['csslint', 'concat'],
+                tasks: ['csslint', 'concat', 'postcss'],
                 options: {
                     livereload: true
                 }
@@ -37,8 +37,11 @@ module.exports = function(grunt) {
             options: {
                 csslintrc: '.csslintrc',
             },
-            all: {
+            src: {
                 src: watchFiles.clientCSS
+            },
+            dist: {
+                src: ['dist/css/<%= pkg.name %>.css', 'dist/views/css/<%= pkg.name %>.css']
             }
         },
         concat: {
@@ -67,25 +70,29 @@ module.exports = function(grunt) {
                 }
             }
         },
-        cssmin: {
+        postcss: {
             options: {
-                // the banner is inserted at the top of the output
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
-                debug: true
+                map: true,
+                processors: [
+                    require('autoprefixer-core')({
+                        browsers: 'last 2 versions'
+                    }),
+                    require('csswring')
+                ]
             },
             dist: {
                 files: [{
-                  expand: true,
-                  cwd: 'dist/',
-                  src: ['*.css', 'views/css/*.css', '!*.min.css', '!views/css/*.min.css'],
-                  dest: 'dist/',
-                  ext: '.min.css'
+                    expand: true,
+                    cwd: '',
+                    src: ['css/*.css', 'views/css/*.css'],
+                    dest: 'dist/',
+                    ext: '.min.css'
                 }]
             }
         },
         htmlmin: {
             dist: {
-                options: { // Target options
+                options: {
                     removeComments: true,
                     collapseWhitespace: true,
                     useShortDoctype: true,
@@ -102,30 +109,12 @@ module.exports = function(grunt) {
                 }
             },
         },
-        ngrok: {
-            options: {
-                authToken: '58gG2R84WMhabrMngcXCN_v5xdHwbeUs52ZUiHucxz'
-            },
-            server: {
-                proto: 'http',
-                port: 8083,
-                remotePort: 50010,
-                onConnected: function(url) {
-                    grunt.log.writeln('Local server exposed to %s!', url);
-                }
-            },
-        },
         pagespeed: {
             options: {
                 nokey: true,
                 url: "",
                 locale: "en_US",
-                threshold: 40
-            },
-            local: {
-                options: {
-                    strategy: "desktop"
-                }
+                threshold: 90
             },
             mobile: {
                 options: {
@@ -151,16 +140,16 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-contrib-imagemin');
+    grunt.loadNpmTasks('grunt-postcss');
     grunt.loadNpmTasks('grunt-ngrok');
     grunt.loadNpmTasks('grunt-pagespeed');
     grunt.loadNpmTasks('grunt-newer');
 
-    grunt.registerTask('default', ['lint', 'optimize', 'psi-ngrok', 'watch']);
-    grunt.registerTask('lint', ['jshint', 'csslint']);
-    grunt.registerTask('optimize', ['newer:uglify', 'newer:concat', 'newer:cssmin', 'newer:htmlmin', 'newer:imagemin']);
+    grunt.registerTask('default', ['optimize', 'lint', 'psi-ngrok'/*, 'watch'*/]);
+    grunt.registerTask('lint', ['jshint', 'csslint:src']);
+    grunt.registerTask('optimize', ['newer:uglify', 'newer:concat', 'newer:postcss', 'newer:htmlmin', 'newer:imagemin']);
     grunt.registerTask('psi-ngrok', 'Run pagespeed with ngrok', function() {
         var done = this.async();
         var port = 8083;
