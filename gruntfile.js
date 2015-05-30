@@ -37,11 +37,8 @@ module.exports = function(grunt) {
             options: {
                 csslintrc: '.csslintrc',
             },
-            src: {
-                src: watchFiles.clientCSS
-            },
-            dist: {
-                src: ['dist/css/<%= pkg.name %>.css', 'dist/views/css/<%= pkg.name %>.css']
+            all: {
+                src: ['output/css/<%= pkg.name %>.css', 'output/views/css/<%= pkg.name %>.css']
             }
         },
         // Copy things to a temp dir, and only change things in the temp dir
@@ -98,8 +95,8 @@ module.exports = function(grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: '',
-                    src: ['output/css/*.css', 'output/views/css/*.css'],
+                    cwd: 'output/',
+                    src: ['css/*.css', 'views/css/*.css'],
                     dest: 'dist/',
                     ext: '.min.css'
                 }]
@@ -161,8 +158,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-ngrok');
     grunt.loadNpmTasks('grunt-pagespeed');
     grunt.loadNpmTasks('grunt-newer');
-    grunt.registerTask('default', ['optimize', 'lint', 'psi-ngrok' /*, 'watch'*/ ]);
-    grunt.registerTask('lint', ['jshint', 'csslint:src']);
+
+    grunt.registerTask('default', ['lint', 'build', 'psi-ngrok' /*, 'watch'*/ ]);
+    grunt.registerTask('lint', ['jshint', 'csslint']);
     grunt.registerTask('build', ['newer:copy', 'useref', 'optimize']);
     grunt.registerTask('optimize', ['newer:concat', 'newer:uglify', 'newer:postcss', 'newer:htmlmin', 'newer:imagemin']);
     grunt.registerTask('psi-ngrok', 'Run pagespeed with ngrok', function() {
