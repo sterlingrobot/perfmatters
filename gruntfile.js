@@ -35,8 +35,7 @@ module.exports = function(grunt) {
         },
         csslint: {
             options: {
-                csslintrc: '.csslintrc',
-                quiet: true
+                csslintrc: '.csslintrc'
             },
             all: {
                 src: watchFiles.clientCSS
@@ -148,17 +147,12 @@ module.exports = function(grunt) {
             }
         }
     });
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-csslint');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-useref');
-    grunt.loadNpmTasks('grunt-contrib-htmlmin');
-    grunt.loadNpmTasks('grunt-contrib-imagemin');
-    grunt.loadNpmTasks('grunt-postcss');
-    grunt.loadNpmTasks('grunt-ngrok');
-    grunt.loadNpmTasks('grunt-pagespeed');
-    grunt.loadNpmTasks('grunt-newer');
+
+    // Load NPM tasks automatically vs calling loadNpmTasks for each
+    require('load-grunt-tasks')(grunt);
+
+    // Making grunt default to force in order not to break the project.
+    grunt.option('force', true);
 
     grunt.registerTask('default', ['lint', 'build', 'psi-ngrok' /*, 'watch'*/ ]);
     grunt.registerTask('lint', ['jshint', 'csslint']);
