@@ -36,9 +36,10 @@ module.exports = function(grunt) {
         csslint: {
             options: {
                 csslintrc: '.csslintrc',
+                quiet: true
             },
             all: {
-                src: ['output/css/<%= pkg.name %>.css', 'output/views/css/<%= pkg.name %>.css']
+                src: watchFiles.clientCSS
             }
         },
         // Copy things to a temp dir, and only change things in the temp dir
@@ -65,8 +66,8 @@ module.exports = function(grunt) {
                 files: {
                     'dist/js/<%= pkg.name %>.js': ['output/js/*.js'],
                     'dist/views/js/<%= pkg.name %>.js': ['output/views/js/*.js'],
-                    'dist/css/<%= pkg.name %>.css': ['output/css/*.css'],
-                    'dist/views/css/<%= pkg.name %>.css': ['output/views/css/*.css']
+                    'dist/css/<%= pkg.name %>.min.css': ['output/css/*.css'],
+                    'dist/views/css/<%= pkg.name %>.min.css': ['output/views/css/*.css']
                 }
             }
         },
@@ -97,7 +98,7 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: 'output/',
                     src: ['css/*.css', 'views/css/*.css'],
-                    dest: 'dist/',
+                    dest: 'output/',
                     ext: '.min.css'
                 }]
             }
@@ -112,8 +113,8 @@ module.exports = function(grunt) {
                     removeStyleLinkTypeAttributes: true,
                     minifyJS: true
                 },
-                files: { // Dictionary of files
-                    'dist/index.html': 'output/index.html', // 'destination': 'source'
+                files: { // Dictionary of files - Use build block outputs from useref
+                    'dist/index.html': 'output/index.html',
                     'dist/project-2048.html': 'output/project-2048.html',
                     'dist/project-mobile.html': 'output/project-mobile.html',
                     'dist/project-webperf.html': 'output/project-webperf.html',
@@ -162,7 +163,7 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['lint', 'build', 'psi-ngrok' /*, 'watch'*/ ]);
     grunt.registerTask('lint', ['jshint', 'csslint']);
     grunt.registerTask('build', ['newer:copy', 'useref', 'optimize']);
-    grunt.registerTask('optimize', ['newer:concat', 'newer:uglify', 'newer:postcss', 'newer:htmlmin', 'newer:imagemin']);
+    grunt.registerTask('optimize', ['newer:postcss', 'newer:concat', 'newer:uglify', 'newer:htmlmin', 'newer:imagemin']);
     grunt.registerTask('psi-ngrok', 'Run pagespeed with ngrok', function() {
         var done = this.async();
         var port = 8083;
