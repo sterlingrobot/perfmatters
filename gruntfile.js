@@ -43,21 +43,10 @@ module.exports = function(grunt) {
         },
         // Remove previously generated builds
         clean: {
-            output: ['output'],
             dist: ['dist']
         },
-        // Copy things to a temp dir, and only change things in the temp dir
+        // Copy things to the dist dir, and only change things in that dir
         copy: {
-            output: {
-                files: [{
-                    expand: true,
-                    cwd: '',
-                    src: ['*.html', 'css/**', 'js/**', 'views/**'],
-                    dest: 'output/'
-                }]
-            }
-        },
-        processhtml: {
             dist: {
                 files: [{
                     expand: true,
@@ -71,10 +60,10 @@ module.exports = function(grunt) {
             options: { },
             dist: {
                 files: {
-                    'dist/js/<%= pkg.name %>.js': ['output/js/*.js'],
-                    'dist/views/js/<%= pkg.name %>.js': ['output/views/js/*.js'],
-                    'dist/css/<%= pkg.name %>.min.css': ['output/css/*.css'],
-                    'dist/views/css/<%= pkg.name %>.min.css': ['output/views/css/*.css']
+                    'dist/js/<%= pkg.name %>.js': ['js/*.js'],
+                    'dist/views/js/<%= pkg.name %>.js': ['views/js/*.js'],
+                    'dist/css/<%= pkg.name %>.min.css': ['css/*.css'],
+                    'dist/views/css/<%= pkg.name %>.min.css': ['views/css/*.css']
                 }
             }
         },
@@ -102,10 +91,20 @@ module.exports = function(grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: 'output/',
+                    cwd: 'dist',
                     src: ['css/*.css', 'views/css/*.css'],
-                    dest: '',
+                    dest: 'dist',
                     ext: '.css'
+                }]
+            }
+        },
+        processhtml: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: 'dist',
+                    src: ['**/*.html'],
+                    dest: 'dist'
                 }]
             }
         },
@@ -117,16 +116,29 @@ module.exports = function(grunt) {
                     useShortDoctype: true,
                     removeScriptTypeAttributes: true,
                     removeStyleLinkTypeAttributes: true,
-                    minifyJS: true
+                    minifyJS: true,
+                    minifyCSS: true
                 },
                 files: { // Dictionary of files - Use build block outputs from useref
-                    'dist/index.html': 'output/index.html',
-                    'dist/project-2048.html': 'output/project-2048.html',
-                    'dist/project-mobile.html': 'output/project-mobile.html',
-                    'dist/project-webperf.html': 'output/project-webperf.html',
-                    'dist/views/pizza.html': 'output/views/pizza.html'
+                    'dist/index.html': 'dist/index.html',
+                    'dist/project-2048.html': 'dist/project-2048.html',
+                    'dist/project-mobile.html': 'dist/project-mobile.html',
+                    'dist/project-webperf.html': 'dist/project-webperf.html',
+                    'dist/views/pizza.html': 'dist/views/pizza.html'
                 }
             },
+        },
+        imagemin: {
+            options: {
+                optimizationLevel: 3
+            },
+            dist: {
+                files: [{
+                    expand: true,
+                    src: ['img/*.{png,jpg,gif}', 'views/images/*.{png,jpg,gif}'],
+                    dest: 'dist/'
+                }]
+            }
         },
         pagespeed: {
             options: {
@@ -140,18 +152,6 @@ module.exports = function(grunt) {
                     strategy: "mobile"
                 }
             }
-        },
-        imagemin: {
-            options: {
-                optimizationLevel: 3
-            },
-            dynamic: {
-                files: [{
-                    expand: true,
-                    src: ['img/*.{png,jpg,gif}', 'views/images/*.{png,jpg,gif}'],
-                    dest: 'dist/'
-                }]
-            }
         }
     });
     // Load NPM tasks automatically vs calling loadNpmTasks for each
@@ -160,8 +160,8 @@ module.exports = function(grunt) {
     grunt.option('force', true);
     grunt.registerTask('default', ['lint', 'build', 'psi-ngrok' /*, 'watch'*/ ]);
     grunt.registerTask('lint', ['jshint', 'csslint']);
-    grunt.registerTask('build', ['clean',  /*'copy','postcss', */'concat', 'uglify', 'optimize']);
-    grunt.registerTask('optimize', [/*'htmlmin',*/'processhtml', 'imagemin']);
+    grunt.registerTask('build', ['clean', 'copy', 'concat', 'uglify', 'postcss', 'optimize']);
+    grunt.registerTask('optimize', ['processhtml', 'htmlmin', 'imagemin']);
     grunt.registerTask('psi-ngrok', 'Run pagespeed with ngrok', function() {
         var done = this.async();
         var port = 8083;
