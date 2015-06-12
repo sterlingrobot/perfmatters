@@ -62,7 +62,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: '',
-                    src: ['**/*.html'],
+                    src: ['**/*.html', '!node_modules/**', '!dist/**'],
                     dest: 'dist/'
                 }]
             }
@@ -160,7 +160,7 @@ module.exports = function(grunt) {
     grunt.option('force', true);
     grunt.registerTask('default', ['lint', 'build', 'psi-ngrok' /*, 'watch'*/ ]);
     grunt.registerTask('lint', ['jshint', 'csslint']);
-    grunt.registerTask('build', ['clean', 'copy', /*'postcss', */'concat', 'uglify', 'optimize']);
+    grunt.registerTask('build', ['clean',  /*'copy','postcss', */'concat', 'uglify', 'optimize']);
     grunt.registerTask('optimize', [/*'htmlmin',*/'processhtml', 'imagemin']);
     grunt.registerTask('psi-ngrok', 'Run pagespeed with ngrok', function() {
         var done = this.async();

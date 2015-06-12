@@ -7,6 +7,11 @@
     <meta name="author" content=" FILL ME IN ">
     <title>Cameron Pittman: Portfolio</title>
 
+    <!-- build:css inline css/perfmatters.min.css -->
+    <link href="css/style.css" rel="stylesheet" media="screen">
+    <link href="css/print.css" rel="stylesheet" media="print">
+    <!--/build -->
+
   </head>
 
   <body>
@@ -60,19 +65,19 @@
       ga('send', 'pageview');
     </script>
     <script async src="http://www.google-analytics.com/analytics.js"></script>
-    <!-- build.js js/perfmatters.min.js -->
+    <!-- build:js js/perfmatters.min.js -->
     <script async src="js/perfmatters.js"></script>
-    <!-- endbuild -->
+    <!--/build -->
     <script>
-      var cb = function() {
-        var l = document.createElement('link'); l.rel = 'stylesheet';
-        l.href = 'css/perfmatters.min.css';
-        var h = document.getElementsByTagName('head')[0]; h.parentNode.insertBefore(l, h);
-      };
-      var raf = requestAnimationFrame || mozRequestAnimationFrame ||
-          webkitRequestAnimationFrame || msRequestAnimationFrame;
-      if (raf) raf(cb);
-      else window.addEventListener('load', cb);
+      // var cb = function() {
+      //   var l = document.createElement('link'); l.rel = 'stylesheet';
+      //   l.href = 'css/perfmatters.min.css';
+      //   var h = document.getElementsByTagName('head')[0]; h.parentNode.insertBefore(l, h);
+      // };
+      // var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+      //     webkitRequestAnimationFrame || msRequestAnimationFrame;
+      // if (raf) raf(cb);
+      // else window.addEventListener('load', cb);
     </script>
   </body>
 </html>
