@@ -22,13 +22,16 @@ grunt
 **Grunt will run the following tasks to check and build an optimized dist folder,
 from which to serve the site.**
 
-- Linting, with JSHint and CSSLint
-- Copying all HTML, CSS & JS files to a temporary output directory, before manipulating them
-- Substituting href and src attributes in HTML files with minified, concatenated versions
-- Processing and minifying CSS files to ensure cross-browser compliance with automatic vendor prefixing
-- Minifying JS, HTML and image files
-- Serving local files through ngrok
-- Running the generated ngrok url through Google's Pagespeed Insights and generating a report in the console
+- Lint JS and CSS files with JSHint and CSSLint
+- Copy all HTML files to the distribution directory, before manipulating them
+- Concatenate JS and CSS files into a single build file
+- Process and minify CSS files to ensure cross-browser compliance with automatic vendor prefixing
+- Minify JS files
+- Substitute href and src attributes within specified build blocks of the HTML files with minified, concatenated versions
+- Minify all HTML files, stripping comments and whitespace and unneccessary attributes
+- Copy all image files to the distribution directory and optimize them
+- Serve local files through ngrok
+- Run the generated ngrok url through Google's Pagespeed Insights and generate a report in the console
 
 Check the performance from Pagespeed Insights in the terminal:
 ```bash
