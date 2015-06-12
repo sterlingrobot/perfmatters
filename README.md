@@ -60,7 +60,8 @@ Main resource server response time         | 2.1
 ####Part 2: Optimize Frames per Second in pizza.html
 
 - The problem:
-Cameron created a cool, dynamic custom pizza generator with interactivity and animation, but it feels really janky and doesn't run at 60fps with fast rendering and responsiveness.  This page needed some performance tuning!  What can be done?
+  * Cameron created a cool, dynamic custom pizza generator with interactivity and animation, but it feels really janky and doesn't run at 60fps with fast rendering and responsiveness.
+  * This page needed some performance tuning!  What can be done?
 
 - The solution(s):
   * Refactor all occurrences of querying the DOM within loops, since this is wasted effort.
