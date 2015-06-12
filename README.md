@@ -38,20 +38,21 @@ Check the performance from Pagespeed Insights in the terminal:
 ```bash
 --------------------------------------------------------
 
-URL:       647cb6f2.ngrok.com
+URL:       6d177c29.ngrok.com
 Strategy:  mobile
-Score:     96
+Score:     94
 
-HTML size                                  | 2.6 kB
+HTML size                                  | 4.53 kB
 Image size                                 | 25.27 kB
-JavaScript size                            | 26.43 kB
+JavaScript size                            | 26.13 kB
 Hosts                                      | 5
 JS resources                               | 2
 Resources                                  | 9
 Static resources                           | 7
-Total size                                 | 959 B
+Total size                                 | 962 B
 
 Leverage browser caching                   | 3
+Main resource server response time         | 2.1
 
 --------------------------------------------------------
 ```
