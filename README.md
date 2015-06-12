@@ -23,7 +23,8 @@ grunt
 from which to serve the site.**
 
 - Lint JS and CSS files with JSHint and CSSLint
-- Copy all HTML files to the distribution directory, before manipulating them
+- Purge any existing distribution directory
+- Copy all HTML files to a new distribution directory, before manipulating them
 - Concatenate JS and CSS files into a single build file
 - Process and minify CSS files to ensure cross-browser compliance with automatic vendor prefixing
 - Minify JS files
@@ -61,7 +62,13 @@ Leverage browser caching                   | 3
 Cameron created a cool, dynamic custom pizza generator with interactivity and animation, but it feels really janky and doesn't run at 60fps with fast rendering and responsiveness.  This page needed some performance tuning!  What can be done?
 
 - The solution(s):
-
+  * Refactor all occurrences of querying the DOM within loops, since this is wasted effort.
+    Get the element to be manipulated first, then iterate through the loop and append or modify content
+  * Don't overuse `document.querySelector` since it is more expensive than calling `document.getElementById`
+    or `document.getElementsByClassName` (don't forget the latter returns an array, so add [0] to get the
+    first element)
+  * Refactor unneccessary function calls and operations to keep calculations streamlined and efficient.  No
+    need to create unneccessary function scopes
 
 
 
