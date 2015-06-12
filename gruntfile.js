@@ -41,9 +41,14 @@ module.exports = function(grunt) {
                 src: watchFiles.clientCSS
             }
         },
+        // Remove previously generated builds
+        clean: {
+            output: ['output'],
+            dist: ['dist']
+        },
         // Copy things to a temp dir, and only change things in the temp dir
         copy: {
-            dist: {
+            output: {
                 files: [{
                     expand: true,
                     cwd: '',
@@ -52,15 +57,18 @@ module.exports = function(grunt) {
                 }]
             }
         },
-        useref: {
-            html: 'output/**/*.html',
-            temp: 'output'
+        processhtml: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: '',
+                    src: ['**/*.html'],
+                    dest: 'dist/'
+                }]
+            }
         },
         concat: {
-            options: {
-                // define a string to put between each file in the concatenated output
-                separator: ';'
-            },
+            options: { },
             dist: {
                 files: {
                     'dist/js/<%= pkg.name %>.js': ['output/js/*.js'],
@@ -84,7 +92,6 @@ module.exports = function(grunt) {
         },
         postcss: {
             options: {
-                map: true,
                 processors: [
                     require('autoprefixer-core')({
                         browsers: 'last 2 versions'
@@ -97,15 +104,15 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: 'output/',
                     src: ['css/*.css', 'views/css/*.css'],
-                    dest: 'output/',
-                    ext: '.min.css'
+                    dest: '',
+                    ext: '.css'
                 }]
             }
         },
         htmlmin: {
             dist: {
                 options: {
-                    removeComments: true,
+                    removeComments: false,
                     collapseWhitespace: true,
                     useShortDoctype: true,
                     removeScriptTypeAttributes: true,
@@ -147,17 +154,14 @@ module.exports = function(grunt) {
             }
         }
     });
-
     // Load NPM tasks automatically vs calling loadNpmTasks for each
     require('load-grunt-tasks')(grunt);
-
     // Making grunt default to force in order not to break the project.
     grunt.option('force', true);
-
     grunt.registerTask('default', ['lint', 'build', 'psi-ngrok' /*, 'watch'*/ ]);
     grunt.registerTask('lint', ['jshint', 'csslint']);
-    grunt.registerTask('build', ['newer:copy', 'useref', 'optimize']);
-    grunt.registerTask('optimize', ['newer:postcss', 'newer:concat', 'newer:uglify', 'newer:htmlmin', 'newer:imagemin']);
+    grunt.registerTask('build', ['clean', 'copy', /*'postcss', */'concat', 'uglify', 'optimize']);
+    grunt.registerTask('optimize', [/*'htmlmin',*/'processhtml', 'imagemin']);
     grunt.registerTask('psi-ngrok', 'Run pagespeed with ngrok', function() {
         var done = this.async();
         var port = 8083;
@@ -168,7 +172,10 @@ module.exports = function(grunt) {
             }
             grunt.config.set('pagespeed.options.url', url);
             grunt.task.run('pagespeed');
-            done();
+            done(function() {
+                // Disconnect after testing
+                ngrok.disconnect();
+            });
         });
     });
 };
