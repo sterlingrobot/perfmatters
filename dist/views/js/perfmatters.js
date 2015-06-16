@@ -399,19 +399,24 @@ var pizzaElementGenerator = function(i) {
 
 // resizePizzas(size) is called when the slider in the "Our Pizzas" section of the website moves.
 var resizePizzas = function(size) {
+
   window.performance.mark("mark_start_resize");   // User Timing API function
+
+  // Store the DOM element to update outside of the changeSliderLabel function
+  // to avoid querying the DOM every time.  document.getElementsByClassName is faster
+  var sliderLabel = document.getElementsByClassName("pizzaSize")[0];
 
   // Changes the value for the size of the pizza above the slider
   function changeSliderLabel(size) {
     switch(size) {
       case "1":
-        document.querySelector("#pizzaSize").innerHTML = "Small";
+        sliderLabel.innerHTML = "Small";
         return;
       case "2":
-        document.querySelector("#pizzaSize").innerHTML = "Medium";
+        sliderLabel.innerHTML = "Medium";
         return;
       case "3":
-        document.querySelector("#pizzaSize").innerHTML = "Large";
+        sliderLabel.innerHTML = "Large";
         return;
       default:
         console.log("bug in changeSliderLabel");
@@ -423,11 +428,13 @@ var resizePizzas = function(size) {
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
 
-    var randomPizzas = document.querySelectorAll(".randomPizzaContainer");
+    // Use document.getElementsByClassName instead of .querySelectorAll
+    var randomPizzas = document.getElementsByClassName("randomPizzaContainer");
     var newsize;
 
     // No need to call superfluous function determineDx (removed) since
     // we only need to set percentage width based on slider size
+
     switch(size) {
       case "1":
         newsize = 25;
@@ -458,8 +465,11 @@ var resizePizzas = function(size) {
 window.performance.mark("mark_start_generating"); // collect timing data
 
 // This for-loop actually creates and appends all of the pizzas when the page loads
+
+// Should not query for DOM elements within the for loop - it just needs to be found once!
+var pizzasDiv = document.getElementById("randomPizzas");
+
 for (var i = 2; i < 100; i++) {
-  var pizzasDiv = document.getElementById("randomPizzas");
   pizzasDiv.appendChild(pizzaElementGenerator(i));
 }
 
@@ -491,14 +501,18 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  // Use getElementsByClassName instead of querySelectorAll
+  // Use getElementsByClassName instead of querySelectorAll - faster
   // Calculate scrollTop outside of for loop
   // Initialize items.length as variable
+  // Set mod, iterate and reset vs using modulo operator
+
   var items = document.getElementsByClassName('mover');
   var scrollPos = document.body.scrollTop / 1250;
+  var mod = 0;
 
   for (var i = 0, l = items.length; i < l; i++) {
-    var phase = Math.sin(scrollPos + (i % 5));
+    var phase = Math.sin(scrollPos + mod);
+    mod = mod === 4 ? 0 : mod + 1;
     items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
   }
 
@@ -519,6 +533,10 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
+
+  // Get DOM element outside of for loop.  Use getElementById instead of querySelector
+  var movingPizzas = document.getElementById("movingPizzas1");
+
   for (var i = 0; i < 200; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
@@ -527,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.style.width = "73.333px";
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
-    document.querySelector("#movingPizzas1").appendChild(elem);
+    movingPizzas.appendChild(elem);
   }
   updatePositions();
 });
