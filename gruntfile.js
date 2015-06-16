@@ -1,11 +1,15 @@
 'use strict';
+
 var ngrok = require('ngrok');
+
 module.exports = function(grunt) {
+
     // Unified Watch Object
     var watchFiles = {
         clientJS: ['js/*.js', 'views/js/*.js'],
         clientCSS: ['views/css/*.css', 'css/*.css']
     };
+
     // Project Configuration
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -119,7 +123,7 @@ module.exports = function(grunt) {
                     minifyJS: true,
                     minifyCSS: true
                 },
-                files: { // Dictionary of files - Use build block outputs from useref
+                files: {
                     'dist/index.html': 'dist/index.html',
                     'dist/project-2048.html': 'dist/project-2048.html',
                     'dist/project-mobile.html': 'dist/project-mobile.html',
@@ -154,10 +158,12 @@ module.exports = function(grunt) {
             }
         }
     });
+
     // Load NPM tasks automatically vs calling loadNpmTasks for each
     require('load-grunt-tasks')(grunt);
     // Making grunt default to force in order not to break the project.
     grunt.option('force', true);
+
     grunt.registerTask('default', ['lint', 'build', 'psi-ngrok' /*, 'watch'*/ ]);
     grunt.registerTask('lint', ['jshint', 'csslint']);
     grunt.registerTask('build', ['clean', 'copy', 'concat', 'uglify', 'postcss', 'optimize']);
