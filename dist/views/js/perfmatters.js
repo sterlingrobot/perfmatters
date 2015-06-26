@@ -1,3 +1,5 @@
+'use strict';
+
 /*
 Welcome to the 60fps project! Your goal is to make Cam's Pizzeria website run
 jank-free at 60 frames per second.
@@ -533,12 +535,16 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
+  var elem;
 
-  // Get DOM element outside of for loop.  Use getElementById instead of querySelector
+  // Only create enough rows of pizzas to fill the viewport height
+  var h = Math.floor(window.innerHeight / 100) * cols;
+
+  // Get/Create DOM element outside of for loop.  Use getElementById instead of querySelector
   var movingPizzas = document.getElementById("movingPizzas1");
 
-  for (var i = 0; i < 200; i++) {
-    var elem = document.createElement('img');
+  for (var i = 0; i < h; i++) {
+    elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
     elem.style.height = "100px";
