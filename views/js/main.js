@@ -19,6 +19,7 @@ cameron *at* udacity *dot* com
 
 // Store any DOM Elements that will be accessed in global variables
 // Set these once DOM content is loaded
+// Set spacing variables immediately based on screen size
 var sliderLabel;
 var randomPizzas;
 var pizzasDiv;
@@ -27,8 +28,8 @@ var moverArrayLength;
 var movingPizzas;
 var screenW = screen.width;
 var screenH = screen.height;
-var s = 256;
-var cols = Math.floor(screenW / s);
+var cols = 8;
+var s = Math.floor(screenW / cols);
 
 // As you may have realized, this website randomly generates pizzas.
 // Here are arrays of all possible pizza ingredients.
@@ -417,9 +418,7 @@ var resizePizzas = function(size) {
 
   window.performance.mark("mark_start_resize");   // User Timing API function
 
-  // Store the DOM element to update outside of the changeSliderLabel function
-  // to avoid querying the DOM every time.  document.getElementsByClassName is faster
-  // UPDATE: Moved to global
+  // UPDATE: Moved sliderLabel to global
 
   // Changes the value for the size of the pizza above the slider
   function changeSliderLabel(size) {
@@ -443,8 +442,7 @@ var resizePizzas = function(size) {
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
 
-    // Use document.getElementsByClassName instead of .querySelectorAll
-    // UPDATE: Move element to global variable
+    // UPDATE: Move randomPizzas element to global variable
     var newsize;
     var l = randomPizzas.length;
 
@@ -495,39 +493,24 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
-function getTranslateX(el) {
-
-  // To extract the current pixel value of element's translateX
-  // match to regular expression and return the number only
-  var tr = el.style.transform.match(/translateX\((\-?[0-9]+)px\)/);
-  return tr ? tr[1] : 0;
-}
-
 // Moves the sliding background pizzas based on scroll position
 function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  // Use getElementsByClassName instead of querySelectorAll - faster
   // Calculate scrollTop outside of for loop
-  // Initialize moverArray.length as variable
-  // Set mod, iterate and reset vs using modulo operator
+  // Set moverArrayLength as outside of function, once elements are created
   // Use translateX instead of setting basicLeft which is more expensive
 
-  console.log(moverArrayLength);
   var scrollPos = document.body.scrollTop / 1250,
-      mod = 0,
-      tr, phase;
+      mod, phase;
 
   for (var i = 0; i < moverArrayLength; i++) {
     mod = i % cols;
     phase = Math.sin(scrollPos + mod);
-    tr = getTranslateX(moverArray[i]) - (screenW/2 * phase);
-    console.log(tr);
     // moverArray[i].style.left = moverArray[i].basicLeft + 100 * phase + 'px';
-    moverArray[i].style.transform = 'translateX(' + tr + 'px)';
+    moverArray[i].style.transform = 'translateX(' + (100 * phase) + 'px) translateZ(0)';
   }
-    // console.log(moverArray[5].style.transform);
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
   // Super easy to create custom metrics.
@@ -540,17 +523,22 @@ function updatePositions() {
 }
 
 // runs updatePositions on scroll
-window.addEventListener('scroll', updatePositions);
+// Change from calling function directly to requestAnimationFrame
+window.addEventListener('scroll', function() {
+      window.requestAnimationFrame(updatePositions);
+});
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
 
+  // Declare outside of for loop
   var elem;
   // Only create enough rows of pizzas to fill the viewport height
   // UPDATE:  Use screen.height to ensure enough pizzas are created for full screen size vs browser window
   var h = Math.floor(screenH / 100) * cols;
 
   // Set DOM Elements that will be accessed in global variables
+  // Use document.getElementById & document.getElementsByClassName instead of .querySelectorAll
   movingPizzas = document.getElementById("movingPizzas1");
   sliderLabel = document.getElementsByClassName("pizzaSize")[0];
   randomPizzas = document.getElementsByClassName("randomPizzaContainer");
@@ -560,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // This for-loop actually creates and appends all of the pizzas when the page loads
   // Should not query for DOM elements within the for loop - it just needs to be found once!
-  // UPDATE: Moved to global
+  // UPDATE: Moved pizzasDiv to global
   for (var i = 2; i < 100; i++) {
     pizzasDiv.appendChild(pizzaElementGenerator(i));
   }
@@ -577,11 +565,13 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.src = "images/pizza.png";
     elem.style.height = "100px";
     elem.style.width = "73.333px";
-    elem.style.transform = 'translateX(' + ((i % cols) * s) + 'px)';
+    // Need to set actual left for translateX to work the same as the original
+    elem.style.left = ((i % cols) * s) + 'px';
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     movingPizzas.appendChild(elem);
   }
 
+  // Set array length after generating the elements
   moverArray = document.getElementsByClassName('mover');
   moverArrayLength = moverArray.length;
 

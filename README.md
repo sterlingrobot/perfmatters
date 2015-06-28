@@ -65,15 +65,19 @@ Main resource server response time         | 2.1
 
 - The solution(s):
   * Refactor all occurrences of querying the DOM within loops, since this is wasted effort.
-    Get the element to be manipulated first, then iterate through the loop and append or modify content
-  * Within for loops, get an array's length during instantiation, instead of calculating it every iteration
+    Store elements in global variables outside of update functions, since they will not change
+  * Within for loops, set an array's length outside of the loop, and in appropriate cases, store in
+    global variable, instead of calculating it every iteration
   * Don't overuse `document.querySelector` since it is more expensive than calling `document.getElementById`
     or `document.getElementsByClassName` (don't forget the latter returns an array, so add [0] to get the
     first element)
   * Refactor unneccessary function calls and operations to keep calculations streamlined and efficient.  No
     need to create unneccessary function scopes
-  * Only create enough background pizzas (moving elements) to fill the viewport by calculating viewport height
-  	using `window.innerHeight` instead of arbitrarily using 200
+  * Only create enough background pizzas (moving elements) to fill the viewport by calculating screen height
+  	using `screen.height` instead of arbitrarily using 200. Also set the horizontal spacing based on `screen.width`.
+  * Instead of setting `element.basicLeft` or `element.style.left`, use `element.transform` to set `translateX(##px)`
+    which does not trigger layout, only composition
+  * Be sure to include `translateZ(0)` to force layer creation for the element to prevent unneccessary painting
 
 
 
